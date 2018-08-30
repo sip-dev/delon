@@ -44,6 +44,8 @@ import {
   ResReNameType,
   ReqReNameType,
   SimpleTableMultiSort,
+  SimpleTableRowClick,
+  SimpleTableLoadOptions,
 } from './interface';
 import { AdSimpleTableConfig } from './simple-table.config';
 import { SimpleTableExport } from './simple-table-export';
@@ -67,22 +69,29 @@ export class SimpleTableComponent implements OnInit, OnChanges, OnDestroy {
   _allChecked = false;
   _indeterminate = false;
   _columns: SimpleTableColumn[] = [];
+  _customTitles: { [key: string]: TemplateRef<any> } = {};
+  _customRows: { [key: string]: TemplateRef<any> } = {};
 
   //#region fields
 
   /** 数据源 */
-  @Input() data: string | any[] | Observable<any[]>;
+  @Input()
+  data: string | any[] | Observable<any[]>;
   /**
    * 额外请求参数，默认自动附加 `pi`、`ps` 至URL
    * - `{ status: 'new' }` => `url?pi=1&ps=10&status=new`
    */
-  @Input() extraParams: any;
+  @Input()
+  extraParams: any;
   /** 请求方法 */
-  @Input() reqMethod: string = 'GET';
+  @Input()
+  reqMethod: string = 'GET';
   /** 请求体 `body` */
-  @Input() reqBody: any;
+  @Input()
+  reqBody: any;
   /** 请求体 `Header` */
-  @Input() reqHeaders: any;
+  @Input()
+  reqHeaders: any;
   /**
    * 重命名请求参数 `pi`、`ps`
    * - `{ pi: 'Page' }` => `pi` 会被替换成 Page
@@ -96,7 +105,8 @@ export class SimpleTableComponent implements OnInit, OnChanges, OnDestroy {
   }
   private _reqReName: ReqReNameType = { pi: 'pi', ps: 'ps' };
   /** 请求异常时回调 */
-  @Output() readonly reqError: EventEmitter<any> = new EventEmitter<any>();
+  @Output()
+  readonly reqError: EventEmitter<any> = new EventEmitter<any>();
   /**
    * 重命名返回参数 `total`、`list`
    * - `{ total: 'Total' }` => Total 会被当作 `total`
@@ -122,7 +132,8 @@ export class SimpleTableComponent implements OnInit, OnChanges, OnDestroy {
   }
   private _resReName: ResReNameType = { total: ['total'], list: ['list'] };
   /** 列描述  */
-  @Input() columns: SimpleTableColumn[] = [];
+  @Input()
+  columns: SimpleTableColumn[] = [];
   /** 每页数量，当设置为 `0` 表示不分页，默认：`10` */
   @Input()
   get ps() {
@@ -187,9 +198,11 @@ export class SimpleTableComponent implements OnInit, OnChanges, OnDestroy {
   }
   private _bordered = false;
   /** table大小 */
-  @Input() size: 'small' | 'middle' | 'default' = 'default';
+  @Input()
+  size: 'small' | 'middle' | 'default' = 'default';
   /** 纵向支持滚动，也可用于指定滚动区域的高度：`{ y: '300px', x: '300px' }` */
-  @Input() scroll: { y?: string; x?: string };
+  @Input()
+  scroll: { y?: string; x?: string };
   /** 是否显示pagination中改变页数 */
   @Input()
   get showSizeChanger() {
@@ -200,7 +213,8 @@ export class SimpleTableComponent implements OnInit, OnChanges, OnDestroy {
   }
   private _showSizeChanger = false;
   /** pagination中每页显示条目数下拉框值 */
-  @Input() pageSizeOptions: number[];
+  @Input()
+  pageSizeOptions: number[];
   /** 是否显示pagination中快速跳转 */
   @Input()
   get showQuickJumper() {
@@ -253,7 +267,8 @@ export class SimpleTableComponent implements OnInit, OnChanges, OnDestroy {
   }
   private _isPageIndexReset = true;
   /** 分页方向 */
-  @Input() pagePlacement?: 'left' | 'center' | 'right' = 'right';
+  @Input()
+  pagePlacement?: 'left' | 'center' | 'right' = 'right';
   /** 切换分页时返回顶部 */
   @Input()
   get toTopInChange() {
@@ -273,7 +288,8 @@ export class SimpleTableComponent implements OnInit, OnChanges, OnDestroy {
   }
   private _toTopOffset = 100;
   /** 重命名排序值，`columns` 的重命名高于属性 */
-  @Input() sortReName: { ascend?: string; descend?: string };
+  @Input()
+  sortReName: { ascend?: string; descend?: string };
   /** 是否多排序，当 `sort` 多个相同值时自动合并，建议后端支持时使用 */
   @Input()
   get multiSort() {
@@ -295,18 +311,24 @@ export class SimpleTableComponent implements OnInit, OnChanges, OnDestroy {
   }
   private _multiSort: boolean | SimpleTableMultiSort;
   /** 数据处理前回调 */
-  @Input() preDataChange: (data: SimpleTableData[]) => SimpleTableData[];
+  @Input()
+  preDataChange: (data: SimpleTableData[]) => SimpleTableData[];
   /** `header` 标题 */
-  @ContentChild('header') header: TemplateRef<void>;
+  @ContentChild('header')
+  header: TemplateRef<void>;
   /** 额外 `body` 内容 */
-  @ContentChild('body') body: TemplateRef<void>;
+  @ContentChild('body')
+  body: TemplateRef<void>;
   /** `footer` 底部 */
-  @ContentChild('footer') footer: TemplateRef<void>;
+  @ContentChild('footer')
+  footer: TemplateRef<void>;
   /** `expand` 可展开，当数据源中包括 `expand` 表示展开状态 */
   @ContentChild('expand')
   expand: TemplateRef<{ $implicit: any; column: SimpleTableColumn }>;
-  @Input() noResult: string | TemplateRef<void>;
-  @Input() widthConfig: string[];
+  @Input()
+  noResult: string | TemplateRef<void>;
+  @Input()
+  widthConfig: string[];
   /** 页码、每页数量变化时回调 */
   @Output()
   readonly change: EventEmitter<SimpleTableChange> = new EventEmitter<
@@ -323,12 +345,26 @@ export class SimpleTableComponent implements OnInit, OnChanges, OnDestroy {
     SimpleTableData
   >();
   /** 排序回调 */
-  @Output() readonly sortChange: EventEmitter<any> = new EventEmitter<any>();
+  @Output()
+  readonly sortChange: EventEmitter<any> = new EventEmitter<any>();
   /** Filter回调 */
   @Output()
   readonly filterChange: EventEmitter<SimpleTableColumn> = new EventEmitter<
     SimpleTableColumn
   >();
+  /** 行单击回调 */
+  @Output()
+  readonly rowClick: EventEmitter<SimpleTableRowClick> = new EventEmitter<
+    SimpleTableRowClick
+  >();
+  /** 行双击回调 */
+  @Output()
+  readonly rowDblClick: EventEmitter<SimpleTableRowClick> = new EventEmitter<
+    SimpleTableRowClick
+  >();
+  /** 行单击多少时长之类为双击（单位：毫秒），默认：`200` */
+  @Input()
+  rowClickTime = 200;
   /** 后端分页是否采用`1`基索引，只在`data`类型为`string`时有效 */
   @Input()
   get zeroIndexedOnPage() {
@@ -373,10 +409,13 @@ export class SimpleTableComponent implements OnInit, OnChanges, OnDestroy {
    * @param pi 指定当前页码，默认：`1`
    * @param extraParams 重新指定 `extraParams` 值
    */
-  load(pi = 1, extraParams?: any) {
+  load(pi = 1, extraParams?: any, options?: SimpleTableLoadOptions) {
     if (pi !== -1) this.pi = pi;
     if (typeof extraParams !== 'undefined') {
-      this.extraParams = extraParams;
+      this.extraParams =
+        options && options.merge
+          ? Object.assign(this.extraParams, extraParams)
+          : extraParams;
     }
     this._change('pi');
   }
@@ -385,17 +424,25 @@ export class SimpleTableComponent implements OnInit, OnChanges, OnDestroy {
    * 重新刷新当前页
    * @param extraParams 重新指定 `extraParams` 值
    */
-  reload(extraParams?: any) {
-    this.load(-1, extraParams);
+  reload(extraParams?: any, options?: SimpleTableLoadOptions) {
+    this.load(-1, extraParams, options);
   }
 
   /**
-   * 重置且重新设置 `pi` 为 `1`
+   * 重置且重新设置 `pi` 为 `1`，包含以下值：
+   * - `check` 数据
+   * - `radio` 数据
+   * - `sort` 数据
+   * - `fileter` 数据
    *
    * @param extraParams 重新指定 `extraParams` 值
    */
-  reset(extraParams?: any) {
-    this.load(1, extraParams);
+  reset(extraParams?: any, options?: SimpleTableLoadOptions) {
+    this.clearCheck();
+    this.clearRadio();
+    this.clearFilter();
+    this.clearSort();
+    this.load(1, extraParams, options);
   }
 
   private getAjaxData(url?: string): Observable<any> {
@@ -593,6 +640,20 @@ export class SimpleTableComponent implements OnInit, OnChanges, OnDestroy {
     return false;
   }
 
+  private rowClickCount = 0;
+  _rowClick(e: Event, item: any, index: number) {
+    ++this.rowClickCount;
+    if (this.rowClickCount !== 1) return;
+    setTimeout(() => {
+      if (this.rowClickCount === 1) {
+        this.rowClick.emit({ e, item, index });
+      } else {
+        this.rowDblClick.emit({ e, item, index });
+      }
+      this.rowClickCount = 0;
+    }, this.rowClickTime);
+  }
+
   //#endregion
 
   //#region sort
@@ -604,9 +665,9 @@ export class SimpleTableComponent implements OnInit, OnChanges, OnDestroy {
 
   private getReqSortMap(): { [key: string]: string } {
     let ret: { [key: string]: string } = {};
-    if (!this._sortOrder) return ret;
-
     const ms = this.multiSort;
+    if (!ms && !this._sortOrder) return ret;
+
     if (ms) {
       Object.keys(this._sortMap)
         .filter(key => this._sortMap[key].enabled && this._sortMap[key].v)
@@ -666,6 +727,11 @@ export class SimpleTableComponent implements OnInit, OnChanges, OnDestroy {
     });
   }
 
+  clearSort() {
+    Object.keys(this._sortMap).forEach(key => (this._sortMap[key].v = null));
+    this._sortOrder = null;
+  }
+
   //#endregion
 
   //#region filter
@@ -692,22 +758,29 @@ export class SimpleTableComponent implements OnInit, OnChanges, OnDestroy {
     this.filterChange.emit(col);
   }
 
-  filterConfirm(col: SimpleTableColumn) {
+  _filterConfirm(col: SimpleTableColumn) {
     this.handleFilter(col);
   }
 
-  filterClear(col: SimpleTableColumn) {
+  _filterClear(col: SimpleTableColumn) {
     col.filters.forEach(i => (i.checked = false));
     this.handleFilter(col);
   }
 
-  filterRadio(
+  _filterRadio(
     col: SimpleTableColumn,
     item: SimpleTableFilter,
     checked: boolean,
   ) {
     col.filters.forEach(i => (i.checked = false));
     item.checked = checked;
+  }
+
+  clearFilter() {
+    this._columns.filter(w => w.filtered === true).forEach(col => {
+      col.filtered = false;
+      col.filters.forEach(f => (f.checked = false));
+    });
   }
 
   //#endregion
@@ -775,7 +848,7 @@ export class SimpleTableComponent implements OnInit, OnChanges, OnDestroy {
 
   //#region buttons
 
-  btnCoerce(list: SimpleTableButton[]): SimpleTableButton[] {
+  private btnCoerce(list: SimpleTableButton[]): SimpleTableButton[] {
     if (!list) return [];
     const ret: SimpleTableButton[] = [];
     for (const item of list) {
@@ -804,7 +877,7 @@ export class SimpleTableComponent implements OnInit, OnChanges, OnDestroy {
     return ret;
   }
 
-  btnCoerceIf(list: SimpleTableButton[]) {
+  private btnCoerceIf(list: SimpleTableButton[]) {
     for (const item of list) {
       if (!item.iif) item.iif = () => true;
       if (!item.children) {
@@ -815,7 +888,8 @@ export class SimpleTableComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  btnClick(record: any, btn: SimpleTableButton) {
+  _btnClick(e: Event, record: any, btn: SimpleTableButton) {
+    if (e) e.stopPropagation();
     if (btn.type === 'modal' || btn.type === 'static') {
       const obj = {};
       obj[btn.paramName || this.defConfig.modalParamsName || 'record'] = record;
@@ -858,7 +932,7 @@ export class SimpleTableComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  btnText(record: any, btn: SimpleTableButton) {
+  _btnText(record: any, btn: SimpleTableButton) {
     if (btn.format) return btn.format(record, btn);
     return btn.text;
   }
@@ -867,16 +941,25 @@ export class SimpleTableComponent implements OnInit, OnChanges, OnDestroy {
 
   //#region fixed
 
-  fixedCoerce(list: SimpleTableColumn[]) {
-    list.forEach((item, idx) => {
-      if (item.fixed && item.width) {
-        if (item.fixed === 'left') {
-          item._left = idx === 0 ? '0px' : list[idx - 1].width;
-        } else {
-          item._right = idx === list.length - 1 ? '0px' : list[idx + 1].width;
-        }
-      }
-    });
+  private fixedCoerce(list: SimpleTableColumn[]) {
+    const countReduce = (a: number, b: SimpleTableColumn) =>
+      a + +b.width.toString().replace('px', '');
+    // left width
+    list
+      .filter(w => w.fixed && w.fixed === 'left' && w.width)
+      .forEach(
+        (item, idx) =>
+          (item._left = list.slice(0, idx).reduce(countReduce, 0) + 'px'),
+      );
+    // right width
+    list
+      .filter(w => w.fixed && w.fixed === 'right' && w.width)
+      .reverse()
+      .forEach(
+        (item, idx) =>
+          (item._right =
+            (idx > 0 ? list.slice(-idx).reduce(countReduce, 0) : 0) + 'px'),
+      );
   }
 
   //#endregion
@@ -1014,6 +1097,12 @@ export class SimpleTableComponent implements OnInit, OnChanges, OnDestroy {
       item.buttons = this.btnCoerce(item.buttons);
       // i18n
       if (item.i18n && this.i18nSrv) item.title = this.i18nSrv.fanyi(item.i18n);
+      // custom row
+      if (item.render) {
+        item.__renderTitle = this._customTitles[item.render];
+        item.__render = this._customRows[item.render];
+      }
+
       ++idx;
       newColumns.push(item);
     }

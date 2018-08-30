@@ -6,6 +6,62 @@ title:
 type: Other
 ---
 
+### 1.3.3
+
+`2018-8-25`
+
+- @delon/theme
+  - 修复 `ModalHelper` 可能会引进 `ngOriginalError` 异常，[#125](https://github.com/cipchk/delon/issues/125) [#626](https://github.com/cipchk/ng-alain/issues/626)
+  - 修复菜单 `group` 属性为 `false` 时应不显示组名，[#137](https://github.com/cipchk/delon/issues/137) [#140](https://github.com/cipchk/delon/issues/140)
+- @delon/form
+  - 放宽手机号格式校验规则，[#645](https://github.com/cipchk/ng-alain/issues/645)
+  - 修复 `placeholder` 属性支持字符串数组，[#142](https://github.com/cipchk/delon/issues/142)
+
+### 1.3.2
+
+`2018-8-19`
+
+- 脚手架
+  - 修复取消时无法清除进度条，[f67c0c](https://github.com/cipchk/ng-alain/commit/f67c0c)
+  - 移除simple-line-icons类库，尽可能使用 ng-zorro-antd 图标库，[28f873](https://github.com/cipchk/ng-alain/commit/28f873)
+- @delon/theme
+  - 增加旋转样式
+- @delon/abc
+  - 修复 `simple-table` 自定义列刷新时丢失问题，[#622](https://github.com/cipchk/ng-alain/issues/622)
+- @delon/form
+  - 修复 `date` 小部件无效属性 `displayFormat`，[#640](https://github.com/cipchk/ng-alain/issues/640)
+
+### 1.3.1
+
+`2018-8-7`
+
+- @delon/abc
+  - `simple-table`
+    - 修复固定列三个以上时宽度计算不正确，[#132](https://github.com/cipchk/delon/issues/132)
+    - 修复 `type: "del"` 无法触发问题，[#614](https://github.com/cipchk/ng-alain/issues/614)
+
+### 1.3.0
+
+`2018-8-4`
+
+- 脚手架
+  - 增加 `ng-zorro-version` 版本号至 `body` 元素，[a36b23](https://github.com/cipchk/ng-alain/commit/a36b23)
+- @delon/abc
+  - `simple-table`
+    - 新增单、双击行回调，[#607](https://github.com/cipchk/ng-alain/issues/607)
+    - 修复切换语言无法自动刷新列名
+    - 修复 `reset()` 方法没有清除单选、多选、过滤、顺序状态值，[#610](https://github.com/cipchk/ng-alain/issues/610)
+    - 修复多排序取消其中一项时排序数据丢失
+  - 新增 `trend` 反显颜色属性 `reverseColor`
+  - 修复 `page-header` 切换语言无法自动刷新，[#598](https://github.com/cipchk/ng-alain/issues/598)
+  - 修复 `sidebar-nav` 小屏幕下产生 ExpressionChangedAfterItHasBeenCheckedError 异常，[#606](https://github.com/cipchk/ng-alain/issues/606)
+- @delon/auth
+  - 新增 `SimpleGuard`、`JWTGuard` Token有效授权守卫，[#127](https://github.com/cipchk/delon/issues/127)
+- @delon/form
+  - 修复 `readOnly` 可编辑状态，[#604](https://github.com/cipchk/ng-alain/issues/604)
+- @delon/theme
+  - 同步 ng-zorro-antd 1.3.0，新增 Drawer 抽屉组件
+
 ### 1.2.0
 
 `2018-7-27`
